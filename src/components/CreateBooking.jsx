@@ -1,7 +1,8 @@
 import React, { Component } from 'react';
 import axios from 'axios';
 import moment from 'moment';
-
+import TimePicker from 'rc-time-picker';
+import 'rc-time-picker/assets/index.css'
 class CreateBooking extends Component {
 
   constructor(props) {
@@ -16,8 +17,8 @@ class CreateBooking extends Component {
   }
 
   onTimeChange = (e) => {
-    let time = e.target.value;
-    console.log(time);
+    console.log(e);
+    let time = moment(e).utc();
 
     this.setState({
       time: time
@@ -66,11 +67,9 @@ class CreateBooking extends Component {
           <div className="form-group row">
             <label htmlFor="bookingTime" className="col-sm-2 col-form-label">Time</label>
             <div className="col-sm-10">
-              <input
-                type="text"
-                className="form-control"
-                id="time"
-                value={this.state.time}
+              <TimePicker
+                showSecond={false}
+                minuteStep={5}
                 onChange={this.onTimeChange}
               />
             </div>
@@ -95,6 +94,13 @@ class CreateBooking extends Component {
         >
           Book
         </button>
+        &nbsp;
+        <a
+          className="btn btn-secondary"
+          href="/"
+        >
+          I have a booking
+        </a>
       </div>
     );
   }
