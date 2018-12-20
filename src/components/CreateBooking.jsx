@@ -1,5 +1,6 @@
 import React, { Component } from 'react';
 import axios from 'axios';
+import moment from 'moment';
 
 class CreateBooking extends Component {
 
@@ -8,8 +9,9 @@ class CreateBooking extends Component {
 
     this.state = {
       time: new Date().toISOString(),
+      name: '',
       success: false,
-      code: 'asdf'
+      code: ''
     };
   }
 
@@ -22,15 +24,30 @@ class CreateBooking extends Component {
     });
   }
 
-  onBookClicked = (e) => {
-    console.log(this.state);
-    axios.put('https://2imhj0j1vk.execute-api.ap-southeast-2.amazonaws.com/default/CreateToken', {
-      startDate: this.state.time,
-      endDate: this.state.time
-    });
+  onNameChange = (e) => {
+    let name = e.target.value;
+    console.log(name);
 
     this.setState({
-      success: true
+      name: name
+    });
+  }
+
+  onBookClicked = async (e) => {
+    let endDate = moment(this.state.time).add(5, 'm').utc();
+    console.log(this.state);
+    let res = await axios.put('https://2imhj0j1vk.execute-api.ap-southeast-2.amazonaws.com/default/CreateToken', {
+      startDate: this.state.time,
+      endDate: endDate,
+      username: this.state.name
+    });
+
+    let code = res.data.code;
+
+    console.log(res);
+    this.setState({
+      success: true,
+      code: code
     });
   }
 
@@ -55,6 +72,18 @@ class CreateBooking extends Component {
                 id="time"
                 value={this.state.time}
                 onChange={this.onTimeChange}
+              />
+            </div>
+          </div>
+          <div className="form-group row">
+            <label htmlFor="name" className="col-sm-2 col-form-label">Name</label>
+            <div className="col-sm-10">
+              <input
+                type="text"
+                className="form-control"
+                id="name"
+                value={this.state.name}
+                onChange={this.onNameChange}
               />
             </div>
           </div>

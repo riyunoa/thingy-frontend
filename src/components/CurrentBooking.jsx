@@ -20,18 +20,19 @@ class CurrentBooking extends Component {
     });
   }
 
-  validateCode = (e) => {
+  validateCode = async (e) => {
     console.log('validate code');
     console.log(this.state);
-    // console.log(this.state);
-    // axios.put('https://2imhj0j1vk.execute-api.ap-southeast-2.amazonaws.com/default/CreateToken', {
-    //   startDate: this.state.time,
-    //   endDate: this.state.time
-    // });
-    //
-    // this.setState({
-    //   success: true
-    // });
+
+    let res = await axios.post('https://fxjhxhz2zj.execute-api.ap-southeast-2.amazonaws.com/default/', {
+      code: this.state.code
+    });
+
+    console.log(res.data);
+
+    this.setState({
+      success: true
+    });
   }
 
   render() {
