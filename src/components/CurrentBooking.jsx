@@ -1,5 +1,6 @@
 import React, { Component } from 'react';
 import axios from "axios";
+import moment from "moment";
 
 class CurrentBooking extends Component {
   constructor(props) {
@@ -8,7 +9,8 @@ class CurrentBooking extends Component {
     this.state = {
       code: '',
       isFree: true,
-      currentBooking: null
+      currentBooking: null,
+      futureUsers: []
     };
 
     this.currentUserTimer = null;
@@ -29,18 +31,29 @@ class CurrentBooking extends Component {
   getCurrentUser = async () => {
     try {
       let res = await axios.get('https://i6zz14po06.execute-api.ap-southeast-2.amazonaws.com/default/CurrentValidToken');
+
+      let username = res.data.username;
+
       console.log(res.data);
-      this.setState({
-        currentBooking: res.data.username,
-        isFree: false
-      });
-    } catch (e) {
-      console.dir(e);
-      if (e.response.status === 404) {
+
+      if (username) {
         this.setState({
+          currentBooking: res.data.username,
+          isFree: false
+        });
+      } else {
+        this.setState({
+          currentBooking: null,
           isFree: true
         });
       }
+
+      this.setState({
+        futureUsers: res.data.futureUsers
+      });
+
+    } catch (e) {
+      console.dir(e);
     }
   }
 
@@ -138,6 +151,25 @@ class CurrentBooking extends Component {
     );
   }
 
+  renderFutureUsers = () => {
+    return (
+      <div className="mt-5">
+        <h2>Coming Up</h2>
+        {this.state.futureUsers.map((futureUser) => {
+          return (
+            <div className="row">
+              <div className="col">
+                {futureUser.username}
+              </div>
+              <div className="col">
+                {moment(futureUser.startDate).format('h:mm a')}
+              </div>
+            </div>
+          );
+        })}
+      </div>
+    );
+  }
 
   render() {
     return (
@@ -147,6 +179,10 @@ class CurrentBooking extends Component {
         }
         {this.state.isFree &&
           this.renderFree()
+        }
+
+        {this.state.futureUsers.length > 0 &&
+          this.renderFutureUsers()
         }
       </div>
     );
