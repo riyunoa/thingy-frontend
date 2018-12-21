@@ -96,7 +96,7 @@ class CreateBooking extends Component {
         </button>
         &nbsp;
         <a
-          className="btn btn-secondary"
+          className="btn btn-outline-primary"
           href="/"
         >
           I have a booking

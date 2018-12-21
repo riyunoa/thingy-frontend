@@ -10,10 +10,20 @@ class CurrentBooking extends Component {
       isFree: true,
       currentBooking: null
     };
+
+    this.currentUserTimer = null;
+    this.turnOffTimer = null;
   }
 
   componentDidMount() {
-    this.getCurrentUser()
+    this.getCurrentUser();
+    let timeout = 30 * 1000;
+    // get the current user every so often
+    this.currentUserTimer = setInterval(this.getCurrentUser, timeout);
+  }
+
+  componentWillUnmount() {
+    clearInterval(this.currentUserTimer);
   }
 
   getCurrentUser = async () => {
@@ -42,7 +52,7 @@ class CurrentBooking extends Component {
       });
 
       console.log('switch off');
-      clearInterval(this.timer);
+      clearTimeout(this.turnOffTimer);
     } catch (e) {
       console.log('failed switching');
     }
@@ -71,7 +81,7 @@ class CurrentBooking extends Component {
       });
 
       let timeout = 1 * 60 * 1000;
-      this.timer = setInterval(this.switchOff, timeout);
+      this.turnOffTimer = setTimeout(this.switchOff, timeout);
     } catch (e) {
       this.setState({
         success: false
@@ -105,7 +115,7 @@ class CurrentBooking extends Component {
         </button>
         &nbsp;
         <a
-          className="btn btn-secondary"
+          className="btn btn-outline-primary"
           href="/create"
         >
           Make New Booking
@@ -119,7 +129,7 @@ class CurrentBooking extends Component {
       <div>
         <h2>The microwave is currently free!</h2>
         <a
-          className="btn btn-secondary"
+          className="btn btn-primary"
           href="/create"
         >
           Make a booking to use it now!
