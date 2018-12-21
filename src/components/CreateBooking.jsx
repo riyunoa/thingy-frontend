@@ -55,7 +55,7 @@ class CreateBooking extends Component {
   render() {
     return (
       <div className="create-booking">
-        <h2>Book a Microwave!</h2>
+        <h2>Book a Microwave</h2>
 
         {this.state.success &&
         <div className="alert alert-success" role="alert">
