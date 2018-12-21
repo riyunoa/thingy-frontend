@@ -14,6 +14,7 @@ class CurrentBooking extends Component {
       futureUsers: [],
       inUse: false,
       gif: null,
+      error: false
     };
 
     this.currentUserTimer = null;
@@ -87,34 +88,46 @@ class CurrentBooking extends Component {
   }
 
   validateCode = async (e) => {
+    this.setState({
+      error: false
+    });
+
     try {
       let res = await axios.post('https://fxjhxhz2zj.execute-api.ap-southeast-2.amazonaws.com/default/', {
         code: this.state.code,
         toggleOn: 1
       });
 
-      console.log(res.data);
+      let status = res.data.status;
+      console.log(status);
 
-      this.setState({
-        success: true,
-        inUse: true,
-      });
-
-      let timeout = 1 * 60 * 1000;
-      this.turnOffTimer = setTimeout(this.switchOff, timeout);
-
-      // FOR GIFS
-      axios.get('http://api.giphy.com/v1/gifs/search?q=microwave&api_key=7pxLspdvigTZ0INIO2CY3LCNyQaw2iOT&limit=1')
-        .then((res) => {
-          if (res.data && res.data.data && res.data.data.length > 0) {
-            let pic = res.data.data[0];
-            this.setState({'gif': pic.images.original.url});
-          }
+      if (status === "SUCCESS") {
+        console.log('success state');
+        this.setState({
+          error: false,
+          inUse: true,
         });
 
+        let timeout = 30 * 1000; // 30s
+        this.turnOffTimer = setTimeout(this.switchOff, timeout);
+
+        // FOR GIFS
+        axios.get('http://api.giphy.com/v1/gifs/search?q=microwave&api_key=7pxLspdvigTZ0INIO2CY3LCNyQaw2iOT&limit=1')
+          .then((res) => {
+            if (res.data && res.data.data && res.data.data.length > 0) {
+              let pic = res.data.data[0];
+              this.setState({'gif': pic.images.original.url});
+            }
+          });
+      } else {
+        this.setState({
+          error: true,
+          inUse: false
+        });
+      }
     } catch (e) {
       this.setState({
-        success: false
+        error: true
       });
     }
   }
@@ -202,6 +215,12 @@ class CurrentBooking extends Component {
   render() {
     return (
       <div className="current-booking">
+        {this.state.error &&
+        <div className="alert alert-danger" role="alert">
+          Your code is invalid. Please try again.
+        </div>
+        }
+
         {!this.state.isFree &&
           this.renderCurrentlyBooked()
         }
