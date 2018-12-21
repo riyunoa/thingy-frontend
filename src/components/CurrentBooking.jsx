@@ -1,5 +1,6 @@
 import React, { Component } from 'react';
 import axios from "axios";
+import './CurrentBooking.css';
 
 class CurrentBooking extends Component {
   constructor(props) {
@@ -8,7 +9,9 @@ class CurrentBooking extends Component {
     this.state = {
       code: '',
       isFree: true,
-      currentBooking: null
+      currentBooking: null,
+      inUse: false,
+      gif: null,
     };
   }
 
@@ -43,6 +46,9 @@ class CurrentBooking extends Component {
 
       console.log('switch off');
       clearInterval(this.timer);
+      this.setState({
+        inUse: false
+      });
     } catch (e) {
       console.log('failed switching');
     }
@@ -67,11 +73,21 @@ class CurrentBooking extends Component {
       console.log(res.data);
 
       this.setState({
-        success: true
+        success: true,
+        inUse: true,
       });
 
       let timeout = 1 * 60 * 1000;
       this.timer = setInterval(this.switchOff, timeout);
+
+      let gifres = axios.get('http://api.giphy.com/v1/gifs/search?q=microwave&api_key=7pxLspdvigTZ0INIO2CY3LCNyQaw2iOT&limit=1')
+        .then((res) => {
+          if (res.data && res.data.data && res.data.data.length > 0) {
+            let pic = res.data.data[0];
+            this.setState({'gif': pic.images.original.url});
+          }
+        });
+
     } catch (e) {
       this.setState({
         success: false
@@ -137,6 +153,20 @@ class CurrentBooking extends Component {
         }
         {this.state.isFree &&
           this.renderFree()
+        }
+        {this.state.inUse &&
+          this.renderGifs()
+        }
+      </div>
+    );
+  }
+
+  renderGifs() {
+    return (
+      <div className="gifs-container">
+        <div>While you wait...</div>
+        { this.state.gif &&
+          <img src={this.state.gif}/>
         }
       </div>
     );
