@@ -62,7 +62,7 @@ class CurrentBooking extends Component {
 
   switchOff = async () => {
     try {
-      let res = await axios.post('https://fxjhxhz2zj.execute-api.ap-southeast-2.amazonaws.com/default/', {
+      await axios.post('https://fxjhxhz2zj.execute-api.ap-southeast-2.amazonaws.com/default/', {
         code: this.state.code,
         toggleOn: 0
       });
@@ -104,7 +104,7 @@ class CurrentBooking extends Component {
       this.turnOffTimer = setTimeout(this.switchOff, timeout);
 
       // FOR GIFS
-      let gifres = axios.get('http://api.giphy.com/v1/gifs/search?q=microwave&api_key=7pxLspdvigTZ0INIO2CY3LCNyQaw2iOT&limit=1')
+      axios.get('http://api.giphy.com/v1/gifs/search?q=microwave&api_key=7pxLspdvigTZ0INIO2CY3LCNyQaw2iOT&limit=1')
         .then((res) => {
           if (res.data && res.data.data && res.data.data.length > 0) {
             let pic = res.data.data[0];
@@ -193,7 +193,7 @@ class CurrentBooking extends Component {
       <div className="gifs-container">
         <div>While you wait...</div>
         { this.state.gif &&
-        <img src={this.state.gif}/>
+        <img src={this.state.gif} alt="Microwave gif" />
         }
       </div>
     );

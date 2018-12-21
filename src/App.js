@@ -5,7 +5,7 @@ import './App.css';
 
 import CreateBooking from "./components/CreateBooking";
 import CurrentBooking from "./components/CurrentBooking";
-import { BrowserRouter as Router, Route, Link } from "react-router-dom";
+import { BrowserRouter as Router, Route } from "react-router-dom";
 
 class App extends Component {
   render() {
