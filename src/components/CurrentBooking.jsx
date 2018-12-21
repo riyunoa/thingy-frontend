@@ -2,13 +2,50 @@ import React, { Component } from 'react';
 import axios from "axios";
 
 class CurrentBooking extends Component {
-
   constructor(props) {
     super(props);
 
     this.state = {
-      code: ''
+      code: '',
+      isFree: true,
+      currentBooking: null
     };
+  }
+
+  componentDidMount() {
+    this.getCurrentUser()
+  }
+
+  getCurrentUser = async () => {
+    try {
+      let res = await axios.get('https://i6zz14po06.execute-api.ap-southeast-2.amazonaws.com/default/CurrentValidToken');
+      console.log(res.data);
+      this.setState({
+        currentBooking: res.data.username,
+        isFree: false
+      });
+    } catch (e) {
+      console.dir(e);
+      if (e.response.status === 404) {
+        this.setState({
+          isFree: true
+        });
+      }
+    }
+  }
+
+  switchOff = async () => {
+    try {
+      let res = await axios.post('https://fxjhxhz2zj.execute-api.ap-southeast-2.amazonaws.com/default/', {
+        code: this.state.code,
+        toggleOn: 0
+      });
+
+      console.log('switch off');
+      clearInterval(this.timer);
+    } catch (e) {
+      console.log('failed switching');
+    }
   }
 
   onCodeChange = (e) => {
@@ -21,24 +58,31 @@ class CurrentBooking extends Component {
   }
 
   validateCode = async (e) => {
-    console.log('validate code');
-    console.log(this.state);
+    try {
+      let res = await axios.post('https://fxjhxhz2zj.execute-api.ap-southeast-2.amazonaws.com/default/', {
+        code: this.state.code,
+        toggleOn: 1
+      });
 
-    let res = await axios.post('https://fxjhxhz2zj.execute-api.ap-southeast-2.amazonaws.com/default/', {
-      code: this.state.code
-    });
+      console.log(res.data);
 
-    console.log(res.data);
+      this.setState({
+        success: true
+      });
 
-    this.setState({
-      success: true
-    });
+      let timeout = 1 * 60 * 1000;
+      this.timer = setInterval(this.switchOff, timeout);
+    } catch (e) {
+      this.setState({
+        success: false
+      });
+    }
   }
 
-  render() {
+  renderCurrentlyBooked = () => {
     return (
-      <div className="current-booking">
-        <h2>Current Booking</h2>
+      <div>
+        <h2>Currently Booked By {this.state.currentBooking}</h2>
 
         <form>
           <div className="form-group">
@@ -66,6 +110,34 @@ class CurrentBooking extends Component {
         >
           Make New Booking
         </a>
+      </div>
+    );
+  }
+
+  renderFree = () => {
+    return (
+      <div>
+        <h2>The microwave is currently free!</h2>
+        <a
+          className="btn btn-secondary"
+          href="/create"
+        >
+          Make a booking to use it now!
+        </a>
+      </div>
+    );
+  }
+
+
+  render() {
+    return (
+      <div className="current-booking">
+        {!this.state.isFree &&
+          this.renderCurrentlyBooked()
+        }
+        {this.state.isFree &&
+          this.renderFree()
+        }
       </div>
     );
   }
